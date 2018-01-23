@@ -29,7 +29,7 @@ ifneq ($(CONFIG_MTK_GIC),y)
 obj-y   += irq/
 endif
 
-obj-$(CONFIG_MTK_CPU_STRESS)	+= cpu_stress/
+#obj-$(CONFIG_MTK_CPU_STRESS)	+= cpu_stress/
 obj-$(CONFIG_MTK_LASTPC)	    += lastpc/
 obj-$(CONFIG_MTK_DBG_DUMP) += dbg_dump/
 
@@ -82,7 +82,7 @@ obj-y	+= ram_console/
 obj-y	+= thermal/
 obj-y	+= videocodec/
 obj-$(CONFIG_MTK_MJC_DRIVER)   += mjc/
-obj-$(CONFIG_MTK_LDVT_VDEC) += vdec/
+#obj-$(CONFIG_MTK_LDVT_VDEC) += vdec/
 obj-y	+= xlog/
 ifneq ($(filter y, $(CONFIG_ARM_PSCI) $(CONFIG_ARM64)),)
 	obj-y   +=  atf_log/
@@ -166,7 +166,7 @@ obj-$(CONFIG_ZRAM)	+= mlog/
 #obj-y	+= cam_cal/src/$(MTK_PLATFORM)/dummy_eeprom/
 
 #lenovo.sw START wangsx3 add for AIO
-obj-$(CONFIG_MTK_CAM_CAL_OV13850SUNNY_SUPPORT) += cam_cal/src/$(MTK_PLATFORM)/ov13850sunny_eeprom/
+#obj-$(CONFIG_MTK_CAM_CAL_OV13850SUNNY_SUPPORT) += cam_cal/src/$(MTK_PLATFORM)/ov13850sunny_eeprom/
 #lenovo.sw END wangsx3 add for AIO
 
 obj-y	+= lens/
@@ -261,7 +261,7 @@ obj-y	+= selinux_warning/
 # MTK PASR SW flow
 obj-$(CONFIG_MTKPASR)	+= mtkpasr/
 
-obj-$(CONFIG_MTK_TC1_FEATURE)	+= tc1_interface/
+#obj-$(CONFIG_MTK_TC1_FEATURE)	+= tc1_interface/
 
 obj-$(CONFIG_MTK_SWITCH_TX_POWER) += sw_tx_power/
 
@@ -273,7 +273,7 @@ obj-$(CONFIG_MTK_SWITCH_TX_POWER) += sw_tx_power/
 obj-$(CONFIG_MTK_BTIF)	+= btif/
 obj-$(CONFIG_MTK_POWER_GS)	+= power_gs/
 obj-$(CONFIG_MTK_VIDEO) += video/
-obj-$(CONFIG_MTK_AEE_MRDUMP)	+= mrdump/
+#obj-$(CONFIG_MTK_AEE_MRDUMP)	+= mrdump/
 obj-$(CONFIG_MTK_WMT_CCCI)	+= wmt_ccci/
 obj-$(CONFIG_MTK_VCOREFS)	+= vcorefs/
 
