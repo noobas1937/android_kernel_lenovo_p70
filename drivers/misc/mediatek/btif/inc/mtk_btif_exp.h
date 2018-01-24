@@ -245,7 +245,7 @@ int mtk_wcn_btif_dbg_ctrl(unsigned long u_id, ENUM_BTIF_DBG_ID flag);
 *        false = fail;
 *****************************************************************************/
 bool mtk_wcn_btif_parser_wmt_evt(unsigned long u_id,
-	const char *sub_str,unsigned int str_len);
+	const char *sub_str, unsigned int str_len);
 
 int mtk_btif_exp_open_test(void);
 int mtk_btif_exp_close_test(void);

@@ -10,12 +10,8 @@
 #include <linux/list.h>
 #include <linux/dma-mapping.h>
 #include <linux/vmalloc.h>
-#if (LINUX_VERSION_CODE >= KERNEL_VERSION(3,9,0))
 #include <linux/sched.h>
 #include <linux/sched/rt.h>
-#else
-#include <linux/sched.h>
-#endif
 #include <linux/kthread.h>
 #include <linux/workqueue.h>
 #include <linux/interrupt.h>
@@ -79,6 +75,11 @@ typedef enum _ENUM_BTIF_STATE_ {
 #else
 #define BTIF_RX_MODE BTIF_MODE_PIO
 #endif
+
+#if !defined(CONFIG_MTK_LEGACY)
+extern struct clk *clk_btif_apdma; /*btif apdma clock*/
+extern struct clk *clk_btif; /*btif  clock*/
+#endif /* !defined(CONFIG_MTK_LEGACY) */
 
 #define BTIF_RX_BTM_CTX BTIF_THREAD_CTX/*BTIF_WQ_CTX*//* BTIF_TASKLET_CTX */
 /*-- cannot be used because ,
@@ -317,14 +318,14 @@ typedef struct _mtk_btif_user_ {
 if (mutex_lock_killable(x)) {\
 	BTIF_ERR_FUNC("mutex_lock_killable return failed\n");\
 	return E_BTIF_INTR; \
-}\
+} \
 } while (0)
 
 #define BTIF_MUTEX_LOCK_RET_NONE(x) do { \
 if (mutex_lock_killable(x)) {\
 	BTIF_ERR_FUNC("mutex_lock_killable return failed\n");\
-	return ; \
-}\
+	return; \
+} \
 } while (0)
 
 #define BTIF_MUTEX_UNLOCK(x) mutex_unlock(x)

@@ -71,6 +71,12 @@
 #define RX_DMA_VFF_LEFT_SIZE(base)      (unsigned long)(base + 0x40)	/*BTIF Rx Virtual FIFO Left Size  Register */
 #define RX_DMA_DEBUG_STATUS(base)       (unsigned long)(base + 0x50)	/*BTIF Rx Virtual FIFO Debug Status Register */
 
+#ifdef CONFIG_MTK_LM_MODE
+#define DMA_VFF_BIT29_OFFSET  0x01
+#define TX_DMA_VFF_ADDR_BIT29(base) (unsigned long)(base + 0x54) /*BTIF Tx Virtual FIFO Base Address Register BIT29*/
+#define RX_DMA_VFF_ADDR_BIT29(base) (unsigned long)(base + 0x54) /*BTIF Rx Virtual FIFO Base Address Register BIT29*/
+#endif
+
 #define DMA_EN_BIT (0x1)
 #define DMA_STOP_BIT (0x1)
 #define DMA_RST_BIT (0x1)
