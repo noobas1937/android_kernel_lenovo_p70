@@ -1,4 +1,4 @@
-Lenovo P70-A nougat kernel. Based on Zormax sources.
+# Lenovo P70-A nougat kernel. Based on Zormax sources.
 # How to build
     cd ~/p70
     make ARCH=arm64 P70_defconfig
