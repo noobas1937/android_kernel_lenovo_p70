@@ -1,0 +1,61 @@
+--- security/selinux/ss/services.c
++++ security/selinux/ss/services.c
+@@ -92,9 +92,10 @@
+ 				    u32 *scontext_len);
+ 
+ static void context_struct_compute_av(struct context *scontext,
+-				      struct context *tcontext,
+-				      u16 tclass,
+-				      struct av_decision *avd);
++					struct context *tcontext,
++					u16 tclass,
++					struct av_decision *avd,
++					struct extended_perms *xperms);
+ 
+ struct selinux_mapping {
+ 	u16 value; /* policy value */
+@@ -615,13 +619,39 @@
+ }
+ 
+ /*
+- * Compute access vectors based on a context structure pair for
+- * the permissions in a particular class.
++ * flag which drivers have permissions
++ * only looking for ioctl based extended permssions
++ */
++void services_compute_xperms_drivers(
++		struct extended_perms *xperms,
++		struct avtab_node *node)
++{
++	unsigned int i;
++
++	if (node->datum.u.xperms->specified == AVTAB_XPERMS_IOCTLDRIVER) {
++		/* if one or more driver has all permissions allowed */
++		for (i = 0; i < ARRAY_SIZE(xperms->drivers.p); i++)
++			xperms->drivers.p[i] |= node->datum.u.xperms->perms.p[i];
++	} else if (node->datum.u.xperms->specified == AVTAB_XPERMS_IOCTLFUNCTION) {
++		/* if allowing permissions within a driver */
++		security_xperm_set(xperms->drivers.p,
++					node->datum.u.xperms->driver);
++	}
++
++	/* If no ioctl commands are allowed, ignore auditallow and auditdeny */
++	if (node->key.specified & AVTAB_XPERMS_ALLOWED)
++		xperms->len = 1;
++}
++
++/*
++ * Compute access vectors and extended permissions based on a context
++ * structure pair for the permissions in a particular class.
+  */
+ static void context_struct_compute_av(struct context *scontext,
+-				      struct context *tcontext,
+-				      u16 tclass,
+-				      struct av_decision *avd)
++					struct context *tcontext,
++					u16 tclass,
++					struct av_decision *avd,
++					struct extended_perms *xperms)
+ {
+ 	struct constraint_node *constraint;
+ 	struct role_allow *ra;

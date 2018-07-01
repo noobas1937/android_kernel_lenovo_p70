@@ -1,0 +1,76 @@
+--- security/selinux/ss/avtab.c
++++ security/selinux/ss/avtab.c
+@@ -466,14 +495,42 @@
+ 		return -EINVAL;
+ 	}
+ 
+-	rc = next_entry(buf32, fp, sizeof(u32));
+-	if (rc) {
+-		printk(KERN_ERR "SELinux: avtab: truncated entry\n");
+-		return rc;
++	if ((vers < POLICYDB_VERSION_XPERMS_IOCTL) &&
++			(key.specified & AVTAB_XPERMS)) {
++		printk(KERN_ERR "SELinux:  avtab:  policy version %u does not "
++				"support extended permissions rules and one "
++				"was specified\n", vers);
++		return -EINVAL;
++	} else if (key.specified & AVTAB_XPERMS) {
++		memset(&xperms, 0, sizeof(struct avtab_extended_perms));
++		rc = next_entry(&xperms.specified, fp, sizeof(u8));
++		if (rc) {
++			printk(KERN_ERR "SELinux: avtab: truncated entry\n");
++			return rc;
++		}
++		rc = next_entry(&xperms.driver, fp, sizeof(u8));
++		if (rc) {
++			printk(KERN_ERR "SELinux: avtab: truncated entry\n");
++			return rc;
++		}
++		rc = next_entry(buf32, fp, sizeof(u32)*ARRAY_SIZE(xperms.perms.p));
++		if (rc) {
++			printk(KERN_ERR "SELinux: avtab: truncated entry\n");
++			return rc;
++		}
++		for (i = 0; i < ARRAY_SIZE(xperms.perms.p); i++)
++			xperms.perms.p[i] = le32_to_cpu(buf32[i]);
++		datum.u.xperms = &xperms;
++	} else {
++		rc = next_entry(buf32, fp, sizeof(u32));
++		if (rc) {
++			printk(KERN_ERR "SELinux: avtab: truncated entry\n");
++			return rc;
++		}
++		datum.u.data = le32_to_cpu(*buf32);
+ 	}
+-	datum.data = le32_to_cpu(*buf32);
+ 	if ((key.specified & AVTAB_TYPE) &&
+-	    !policydb_type_isvalid(pol, datum.data)) {
++	    !policydb_type_isvalid(pol, datum.u.data)) {
+ 		printk(KERN_ERR "SELinux: avtab: invalid type\n");
+ 		return -EINVAL;
+ 	}
+@@ -544,8 +602,22 @@
+ 	rc = put_entry(buf16, sizeof(u16), 4, fp);
+ 	if (rc)
+ 		return rc;
+-	buf32[0] = cpu_to_le32(cur->datum.data);
+-	rc = put_entry(buf32, sizeof(u32), 1, fp);
++
++	if (cur->key.specified & AVTAB_XPERMS) {
++		rc = put_entry(&cur->datum.u.xperms->specified, sizeof(u8), 1, fp);
++		if (rc)
++			return rc;
++		rc = put_entry(&cur->datum.u.xperms->driver, sizeof(u8), 1, fp);
++		if (rc)
++			return rc;
++		for (i = 0; i < ARRAY_SIZE(cur->datum.u.xperms->perms.p); i++)
++			buf32[i] = cpu_to_le32(cur->datum.u.xperms->perms.p[i]);
++		rc = put_entry(buf32, sizeof(u32),
++				ARRAY_SIZE(cur->datum.u.xperms->perms.p), fp);
++	} else {
++		buf32[0] = cpu_to_le32(cur->datum.u.data);
++		rc = put_entry(buf32, sizeof(u32), 1, fp);
++	}
+ 	if (rc)
+ 		return rc;
+ 	return 0;
